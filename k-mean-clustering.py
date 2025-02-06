@@ -69,3 +69,60 @@ centroids = compute_centroids(X, idx, K)
 print(f"The centroids are: {centroids}")
 
 compute_centroids_test(compute_centroids)
+
+# K-means on a sample dataset
+def run_kMeans(X, initial_centroids, max_iters=10, plot_progress=False):
+    """
+    Runs the K-Means algorithm on data matrix X, where each row of X
+    is a single example
+    """
+    
+    # Initialize values
+    m, n = X.shape
+    K = initial_centroids.shape[0]
+    centroids = initial_centroids
+    previous_centroids = centroids    
+    idx = np.zeros(m)
+    plt.figure(figsize=(8, 6))
+
+    # Run K-Means
+    for i in range(max_iters):
+        print("K-Means iteration %d/%d" % (i, max_iters-1))
+        idx = find_closet_centroids(X, centroids)
+        if plot_progress:
+            plot_progress_kMeans(X, centroids, previous_centroids, idx, K, i)
+            previous_centroids = centroids
+
+        centroids = compute_centroids(X, idx, K)
+    plt.show() 
+    return centroids, idx
+
+X = load_data()
+initial_centroids = np.array([[3,3],[6,2],[8,5]])
+max_iters = 10
+centroids, idx = run_kMeans(X, initial_centroids, max_iters, plot_progress = True)
+
+
+# Random initialization
+def kMeans_init_centroids(X, K):
+    """
+    This function initializes K centroids that are to be 
+    used in K-Means on the dataset X
+    
+    Args:
+        X (ndarray): Data points 
+        K (int):     number of centroids/clusters
+    
+    Returns:
+        centroids (ndarray): Initialized centroids
+    """
+    
+    randidx = np.random.permutation(X.shape[0])
+    centroids = X[randidx[:K]]
+    
+    return centroids
+
+K = 3
+max_iters = 10
+initial_centroids = kMeans_init_centroids(X, K)
+centroids, idx = run_kMeans(X, initial_centroids, max_iters, plot_progress=True)
